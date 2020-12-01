@@ -29,6 +29,7 @@ dependencies:
 - mtl
 - vector
 - pointedlist
+- recursion-schemes
 
 library:
   source-dirs: src
