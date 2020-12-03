@@ -1,3 +1,7 @@
+{-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE AllowAmbiguousTypes #-}
+
 module Util.Util where
 
 {- ORMOLU_DISABLE -}
@@ -9,11 +13,22 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
+import Data.Coerce (Coercible, coerce)
+import Data.Foldable (fold)
+import Data.Bifoldable
 {- ORMOLU_ENABLE -}
 
 {-
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
 -}
+
+
+foldN :: forall b a f. (Coercible a b, Coercible (f a) (f b), Monoid b, Foldable f) => (a -> b) -> f a -> a
+foldN _ fs = coerce @b @a $ fold $ coerce @(f a) @(f b) fs
+
+bifoldN :: forall b a f. (Coercible a b, Coercible (f a a) (f b b), Monoid b, Bifoldable f) => (a -> b) -> f a a -> a
+bifoldN _ fs = coerce @b @a $ bifold $ coerce @(f a a) @(f b b) fs
+
 
 -- Takes a list.
 -- Returns a map from elements of that list to the number of times they appeared in the list.
