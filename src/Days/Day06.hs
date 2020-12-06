@@ -22,10 +22,10 @@ runDay = R.runDay inputParser partA partB
 inputParser :: Parser Input
 inputParser =
   flip sepBy1' (endOfLine *> endOfLine) $
-    fromList <$> sepBy1' (many1' letter) endOfLine
+    fromList <$> sepBy1' (fromList <$> many1' letter) endOfLine
 
 ------------ TYPES ------------
-type Input = [NonEmpty [Char]]
+type Input = [NonEmpty (Set Char)]
 
 type OutputA = Int
 
@@ -35,9 +35,9 @@ type OutputB = Int
 sumCombinedSets
   :: (Coercible (Set a) b, Semigroup b, Ord a)
   => (Set a -> b)
-  -> [NonEmpty [a]]
+  -> [NonEmpty (Set a)]
   -> Int
-sumCombinedSets f = foldMapN Sum (length . foldMap1N f fromList)
+sumCombinedSets f = foldMapN Sum (length . fold1N f)
 
 partA :: Input -> OutputA
 partA = sumCombinedSets id
