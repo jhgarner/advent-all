@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: a4c19baa9a45de768ee2fbb22411fdb093631cdcd033055212283ef5d9858ee8
+-- hash: 7379de03d5c46e206a30bc59d663888de7687c18f01c23c01f9c6ddb1bf3144d
 
 name:           aoc-template
 version:        0.1.0.0
@@ -69,6 +69,7 @@ library
     , parser-combinators
     , pointedlist
     , recursion-schemes
+    , semigroupoids
     , text
     , vector
   default-language: Haskell2010
@@ -92,6 +93,7 @@ executable aoc-template-exe
     , parser-combinators
     , pointedlist
     , recursion-schemes
+    , semigroupoids
     , text
     , vector
   default-language: Haskell2010

@@ -30,6 +30,7 @@ dependencies:
 - vector
 - pointedlist
 - recursion-schemes
+- semigroupoids
 
 library:
   source-dirs: src

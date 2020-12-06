@@ -1,20 +1,18 @@
+{-# LANGUAGE OverloadedLists #-}
+{-# LANGUAGE ScopedTypeVariables #-}
+{-# LANGUAGE TypeApplications #-}
+
 module Days.Day06 (runDay) where
 
 {- ORMOLU_DISABLE -}
-import Data.List hiding (intersect)
-import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
-import Data.Maybe
-import Data.Set (Set, fromList, intersection)
-import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
+import GHC.Exts (fromList)
+import Data.List.NonEmpty (NonEmpty)
+import Data.Set (Set)
+import Util.Util
 import Data.Monoid
-
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
-import Data.Void
+import Data.Coerce (Coercible)
 {- ORMOLU_ENABLE -}
 
 runDay :: Bool -> String -> IO ()
@@ -22,27 +20,28 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = flip sepBy1' endOfLine $ do
-  sepBy (many1' letter) endOfLine
+inputParser =
+  flip sepBy1' (endOfLine *> endOfLine) $
+    fromList <$> sepBy1' (many1' letter) endOfLine
 
 ------------ TYPES ------------
-type Input = [[[Char]]]
+type Input = [NonEmpty [Char]]
 
 type OutputA = Int
 
 type OutputB = Int
 
 ------------ PART A ------------
-groupToSet :: [[Char]] -> Set Char
-groupToSet = foldMap fromList
+sumCombinedSets
+  :: (Coercible (Set a) b, Semigroup b, Ord a)
+  => (Set a -> b)
+  -> [NonEmpty [a]]
+  -> Int
+sumCombinedSets f = foldMapN Sum (length . foldMap1N f fromList)
 
 partA :: Input -> OutputA
-partA = getSum . foldMap (Sum . length . groupToSet)
+partA = sumCombinedSets id
 
 ------------ PART B ------------
-groupToSetI :: [[Char]] -> Set Char
-groupToSetI [] = mempty
-groupToSetI (l:ls) = foldl' (\acc a -> acc `intersection` fromList a) (fromList l) ls 
-
 partB :: Input -> OutputB
-partB = getSum . foldMap (Sum . length . groupToSetI)
+partB = sumCombinedSets Intersection

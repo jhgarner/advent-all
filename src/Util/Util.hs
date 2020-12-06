@@ -9,12 +9,13 @@ import Data.List
 import Data.Map.Strict (Map)
 import qualified Data.Map.Strict as Map
 import Data.Maybe
-import Data.Set (Set)
+import Data.Set (Set, intersection)
 import qualified Data.Set as Set
 import Data.Vector (Vector)
 import qualified Data.Vector as Vec
 import Data.Coerce (Coercible, coerce)
 import Data.Foldable (fold)
+import Data.Semigroup.Foldable
 import Data.Bifoldable
 {- ORMOLU_ENABLE -}
 
@@ -22,9 +23,20 @@ import Data.Bifoldable
 This module contains a series of miscellaneous utility functions that I have found helpful in the past.
 -}
 
+newtype Intersection a = Intersection (Set a)
+
+instance Ord a => Semigroup (Intersection a) where
+  Intersection a <> Intersection b = Intersection $ a `intersection` b
+
 
 foldN :: forall b a f. (Coercible a b, Coercible (f a) (f b), Monoid b, Foldable f) => (a -> b) -> f a -> a
 foldN _ fs = coerce @b @a $ fold $ coerce @(f a) @(f b) fs
+
+foldMapN :: forall b a c f. (Coercible a b, Coercible (f a) (f b), Monoid b, Foldable f) => (a -> b) -> (c -> a) -> f c -> a
+foldMapN _ f fs = coerce @b @a $ foldMap (coerce @a @b . f) fs
+
+foldMap1N :: forall b a c f. (Coercible a b, Coercible (f a) (f b), Semigroup b, Foldable1 f) => (a -> b) -> (c -> a) -> f c -> a
+foldMap1N _ f fs = coerce @b @a $ foldMap1 (coerce @a @b . f) fs
 
 bifoldN :: forall b a f. (Coercible a b, Coercible (f a a) (f b b), Monoid b, Bifoldable f) => (a -> b) -> f a a -> a
 bifoldN _ fs = coerce @b @a $ bifold $ coerce @(f a a) @(f b b) fs
