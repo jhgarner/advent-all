@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 7379de03d5c46e206a30bc59d663888de7687c18f01c23c01f9c6ddb1bf3144d
+-- hash: 1d31f299f445954c3b2f7d86839fc6a4ff24987f556c07123045799f18c7887f
 
 name:           aoc-template
 version:        0.1.0.0
@@ -58,7 +58,7 @@ library
       Paths_aoc_template
   hs-source-dirs:
       src
-  default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable
+  default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable DataKinds FlexibleContexts GADTs LambdaCase PolyKinds RankNTypes ScopedTypeVariables TypeApplications TypeOperators TypeFamilies
   build-depends:
       attoparsec
     , base >=4.7 && <5
@@ -68,6 +68,7 @@ library
     , optparse-applicative
     , parser-combinators
     , pointedlist
+    , polysemy
     , recursion-schemes
     , semigroupoids
     , text
@@ -92,6 +93,7 @@ executable aoc-template-exe
     , optparse-applicative
     , parser-combinators
     , pointedlist
+    , polysemy
     , recursion-schemes
     , semigroupoids
     , text

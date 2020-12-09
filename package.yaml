@@ -31,6 +31,7 @@ dependencies:
 - pointedlist
 - recursion-schemes
 - semigroupoids
+- polysemy
 
 library:
   source-dirs: src
@@ -50,6 +51,16 @@ library:
     - NumericUnderscores
     - DeriveFunctor
     - DeriveFoldable
+    - DataKinds
+    - FlexibleContexts
+    - GADTs
+    - LambdaCase
+    - PolyKinds
+    - RankNTypes
+    - ScopedTypeVariables
+    - TypeApplications
+    - TypeOperators
+    - TypeFamilies
 
 executables:
   aoc-template-exe:

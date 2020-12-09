@@ -12,7 +12,7 @@ import qualified Data.Vector as Vec
 import qualified Util.Util as U
 
 import qualified Program.RunDay as R (runDay)
-import Data.Attoparsec.Text
+import Data.Attoparsec.Text hiding (take)
 import Data.Void
 {- ORMOLU_ENABLE -}
 
@@ -21,19 +21,39 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = sepBy1' decimal endOfLine
 
 ------------ TYPES ------------
-type Input = Void
+type Input = [Integer]
 
-type OutputA = Void
+type OutputA = Integer
 
-type OutputB = Void
+type OutputB = Integer
 
 ------------ PART A ------------
+p :: Int
+p = 25
+
+sumTo :: Integer -> [Integer] -> Bool
+sumTo n (x:xs) = elem (n-x) xs || sumTo n xs
+sumTo _ [] = False
+
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA ls =
+  let pre = take p ls
+      isGood = sumTo (ls !! p) pre
+   in if isGood then partA (tail ls) else ls !! p
 
 ------------ PART B ------------
+contSum :: Integer -> [Integer] -> [Integer] -> [Integer]
+contSum n hs ts = let s = sum hs in
+  if
+    | s == n -> hs
+    | s > n -> contSum n (tail hs) ts
+    | s < n -> contSum n (hs ++ [head ts]) (tail ts)
+
+
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB ls =
+  let result = contSum (partA ls) [] ls
+   in minimum result + maximum result
