@@ -21,19 +21,41 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = Set.fromList <$> sepBy1' decimal endOfLine
 
 ------------ TYPES ------------
-type Input = Void
+type Input = Set Int
 
-type OutputA = Void
+type OutputA = Int
 
-type OutputB = Void
+type OutputB = Integer
 
 ------------ PART A ------------
+
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA ads = uncurry (*) $ nextAdaptor 0
+  where
+    nextAdaptor :: Int -> (Int, Int)
+    nextAdaptor n =
+      if
+        | Set.member (n+1) ads -> let (os, ts) = nextAdaptor (n+1) in (os+1,ts)
+        | Set.member (n+2) ads -> nextAdaptor (n+2) 
+        | Set.member (n+3) ads -> let (os, ts) = nextAdaptor (n+1) in (os,ts+1)
+        | otherwise -> (0, 1)
 
 ------------ PART B ------------
 partB :: Input -> OutputB
-partB = error "Not implemented yet!"
+partB ads = allAdaptors 0
+  where
+    m = maximum ads
+    -- Thanks HaskellWiki for giving me this code although I don't know why it memoizes...
+    allAdaptors = (map allAds [0 ..] !!)
+      where
+        allAds n
+          | n == m = 1
+          | otherwise = sum $ fmap (\i -> if Set.member (n+i) ads then allAdaptors (n+i) else 0) [1, 2, 3]
+    -- allAdaptors :: Int -> Integer
+    -- allAdaptors n
+    --   | n == m = 1
+    --   | otherwise = sum $ fmap (\i -> if Set.member (n+i) ads then allAdaptors (n+i) else 0) [1, 2, 3]
+      
