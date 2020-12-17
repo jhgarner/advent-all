@@ -33,9 +33,12 @@ dependencies:
 - semigroupoids
 - polysemy
 - free
+- massiv
 
 library:
   source-dirs: src
+  ghc-options:
+  - -O2
   default-extensions:
     - EmptyCase
     - FlexibleContexts

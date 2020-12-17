@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3029951944ebf5c4334e853b37f587322a17881de1e4f353039a7afc32746d20
+-- hash: 814bdc3d1020e8fe50c4adf26b78c3c29612385070c148edcae99a959344acad
 
 name:           aoc-template
 version:        0.1.0.0
@@ -59,12 +59,14 @@ library
   hs-source-dirs:
       src
   default-extensions: EmptyCase FlexibleContexts FlexibleInstances InstanceSigs MultiParamTypeClasses LambdaCase MultiWayIf RecordWildCards TupleSections OverloadedStrings ScopedTypeVariables GADTs NumericUnderscores DeriveFunctor DeriveFoldable DataKinds FlexibleContexts GADTs LambdaCase PolyKinds RankNTypes ScopedTypeVariables TypeApplications TypeOperators TypeFamilies
+  ghc-options: -O2
   build-depends:
       attoparsec
     , base >=4.7 && <5
     , containers
     , directory
     , free
+    , massiv
     , mtl
     , optparse-applicative
     , parser-combinators
@@ -91,6 +93,7 @@ executable aoc-template-exe
     , containers
     , directory
     , free
+    , massiv
     , mtl
     , optparse-applicative
     , parser-combinators
