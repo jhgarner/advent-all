@@ -7,14 +7,6 @@ import Prelude hiding (replicate, sum, map)
 -- import Data.List
 import Data.Map.Strict (Map)
 import Data.Foldable hiding (sum)
-import qualified Data.Map.Strict as Map
-import Data.Maybe
-import Data.Set (Set)
-import qualified Data.Set as Set
-import Data.Vector (Vector)
-import qualified Data.Vector as Vec
-import qualified Util.Util as U
-
 import qualified Program.RunDay as R (runDay)
 import Data.Attoparsec.Text
 import Data.Void
@@ -30,56 +22,58 @@ runDay = R.runDay inputParser partA partB
 inputParser :: Parser Input
 inputParser = flip sepBy1' endOfLine $ do
   many1' $ choice
-    [ char '.' $> False
-    , char '#' $> True
+    [ char '.' $> 0
+    , char '#' $> 1
     ]
 
 ------------ TYPES ------------
-type Input = [[Bool]]
+type Input = [[Int]]
 
 type OutputA = Int
--- type OutputA = Array U Ix3 Bool
+-- type OutputA = Array U Ix3 Int
 
 type OutputB = Int
 
 ------------ PART A ------------
-prepRound :: Input -> Array U Ix3 Bool
+prepRound :: Input -> Array U Ix3 Int
 prepRound ls = fromLists' Par [ls]
 
-growByOne :: Array U Ix3 Bool -> Array U Ix3 Bool
+-- This is poorly named. It grows the array by 6 since that's the max size
+growByOne :: Array U Ix3 Int -> Array U Ix3 Int
 growByOne a = computeAs U $ foldl' (\acc i -> let Sz3 d h w = size acc
                                                   newSize =
                                                     case i of
                                                       1 -> Sz3 d h 6
                                                       2 -> Sz3 d 6 w
                                                       3 -> Sz3 6 h w
-                                                  border = computeAs U $ replicate Par newSize False
-                                              in concat' (Dim i) [border, computeAs U acc, border]) (toLoadArray a) [1, 2, 3]
+                                                  border = computeAs U $ replicate Par newSize 0
+                                              in computeAs U $ concat' (Dim i) [border, acc, border]) a [1, 2, 3]
 
-actionStencil :: Stencil Ix3 Bool Bool
-actionStencil = makeStencilDef False (Sz (3 :> 3 :. 3)) (1 :> 1 :. 1) $ \get ->
+actionStencil :: Stencil Ix3 Int Int
+actionStencil = makeStencilDef 0 (Sz (3 :> 3 :. 3)) (1 :> 1 :. 1) $ \get ->
   shouldActive <$> myState get <*> sum (fmap (countNeighber get) ((-1, -1, -1) ... (1, 1, 1)))
   where
     countNeighber _ (0, 0, 0) = 0
-    countNeighber get (i, j, k) = fromEnum <$> get (i :> j :. k)
+    countNeighber get (i, j, k) = get (i :> j :. k)
     myState get = get $ 0 :> 0 :. 0
     shouldActive me i
-      | me && (i == 2 || i == 3) = True
-      | i == 3 = True
-      | otherwise = False
+      | me == 1 && (i == 2 || i == 3) = 1
+      | i == 3 = 1
+      | otherwise = 0
 
-applyStep :: Array U Ix3 Bool -> Array U Ix3 Bool
-applyStep a = convertAs U $ mapStencil (Fill False) actionStencil a
+applyStep :: Array U Ix3 Int -> Array U Ix3 Int
+applyStep a = computeAs U $ mapStencil (Fill 0) actionStencil a
 
 partA :: Input -> OutputA
-partA = sum . map fromEnum . applyStep . applyStep . applyStep . applyStep . applyStep . applyStep . growByOne . prepRound
+partA = sum . applyStep . applyStep . applyStep . applyStep . applyStep . applyStep . growByOne . prepRound
 
 ------------ PART B ------------
 
-prepRoundB :: Input -> Array U Ix4 Bool
+prepRoundB :: Input -> Array U Ix4 Int
 prepRoundB ls = fromLists' Par [[ls]]
 
-growByOneB :: Array U Ix4 Bool -> Array U Ix4 Bool
+-- This is poorly named. It grows the array by 6 since that's the max size
+growByOneB :: Array U Ix4 Int -> Array U Ix4 Int
 growByOneB a = computeAs U $ foldl' (\acc i -> let Sz4 z d h w = size acc
                                                    newSize =
                                                      case i of
@@ -87,23 +81,22 @@ growByOneB a = computeAs U $ foldl' (\acc i -> let Sz4 z d h w = size acc
                                                        2 -> Sz4 z d 6 w
                                                        3 -> Sz4 z 6 h w
                                                        4 -> Sz4 6 d h w
-                                                   border = computeAs U $ replicate Par newSize False
-                                                in concat' (Dim i) [border, computeAs U acc, border]) (toLoadArray a) [1, 2, 3, 4]
+                                                   border = computeAs U $ replicate Par newSize 0
+                                                in computeAs U $ concat' (Dim i) [border, acc, border]) a [1, 2, 3, 4]
 
-actionStencilB :: Stencil Ix4 Bool Bool
-actionStencilB = makeStencilDef False (Sz (3 :> 3 :> 3 :. 3)) (1 :> 1 :> 1 :. 1) $ \get ->
-  shouldActive <$> myState get <*> sum (fmap (countNeighber get) ((-1, -1, -1, -1) ... (1, 1, 1, 1)))
+actionStencilB :: Stencil Ix4 Int Int
+actionStencilB = makeStencilDef 0 (Sz (3 :> 3 :> 3 :. 3)) (1 :> 1 :> 1 :. 1) $ \get ->
+  shouldActive <$> myState get <*> sum (map (countNeighber get) ((-1, -1, -1, -1) ... (1, 1, 1, 1)))
   where
-    countNeighber _ (0, 0, 0, 0) = 0
-    countNeighber get (i, j, k, w) = fromEnum <$> get (i :> j :> k :. w)
+    countNeighber get (i, j, k, w) = get (i :> j :> k :. w)
     myState get = get $ 0 :> 0 :> 0 :. 0
     shouldActive me i
-      | me && (i == 2 || i == 3) = True
-      | i == 3 = True
-      | otherwise = False
+      | me == 1 && (i == 3 || i == 4) = 1
+      | i == 3 = 1
+      | otherwise = 0
 
-applyStepB :: Array U Ix4 Bool -> Array U Ix4 Bool
-applyStepB a = convertAs U $ mapStencil (Fill False) actionStencilB a
+applyStepB :: Array U Ix4 Int -> Array U Ix4 Int
+applyStepB a = computeAs U $ mapStencil (Fill 0) actionStencilB a
 
 partB :: Input -> OutputB
-partB = sum . map (fromEnum) . applyStepB . applyStepB . applyStepB . applyStepB . applyStepB . applyStepB . growByOneB . prepRoundB
+partB = sum . applyStepB . applyStepB . applyStepB . applyStepB . applyStepB . applyStepB . growByOneB . prepRoundB
