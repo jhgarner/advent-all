@@ -62,9 +62,8 @@ parseInput (PipeF ls) s = asum $ fmap (foldl' (>>=) $ Just s) ls
 
 parseInputB :: RuleF ([String] -> [Maybe String]) -> [String] -> [Maybe String]
 parseInputB _ [] = []
-parseInputB (LitF l) ls = filter (not . null) $ fmap (\case
-                                                        c:cs -> if c == l then Just cs else Nothing
-                                                        [] -> Nothing) ls
+parseInputB (LitF l) ls = fmap (\case c:cs -> if c == l then Just cs else Nothing
+                                      [] -> Nothing) ls
 parseInputB (PipeF ls) ss = filter (not . null) $ concatMap (($ ss) . foldl1 (\acc a -> a . fmap fromJust . acc)) ls
 
 type Input = (Map Int (RuleF Int), [String])
