@@ -21,18 +21,27 @@ runDay = R.runDay inputParser partA partB
 
 ------------ PARSER ------------
 inputParser :: Parser Input
-inputParser = error "Not implemented yet!"
+inputParser = (,) <$> decimal <*> (endOfLine *> decimal)
 
 ------------ TYPES ------------
-type Input = Void
+type Input = (Int, Int)
 
-type OutputA = Void
+type OutputA = Int
 
 type OutputB = Void
 
 ------------ PART A ------------
+guessAll :: Int -> Int -> Int -> Int
+guessAll n pk goalPk =
+  let newPk = (pk * 7) `mod` 20201227
+   in if newPk == goalPk then n else guessAll (n+1) newPk goalPk
+
+genIt :: Int -> Int -> Int -> Int
+genIt 0 pk i = i
+genIt n pk i = genIt (n-1) pk $ (pk * i) `mod` 20201227
+
 partA :: Input -> OutputA
-partA = error "Not implemented yet!"
+partA (a, b) = genIt (guessAll 1 1 a) b 1
 
 ------------ PART B ------------
 partB :: Input -> OutputB
