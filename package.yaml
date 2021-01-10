@@ -41,6 +41,9 @@ library:
   - -O2
   default-extensions:
     - EmptyCase
+    - DeriveTraversable
+    - DeriveFoldable
+    - DeriveFunctor
     - FlexibleContexts
     - FlexibleInstances
     - InstanceSigs
